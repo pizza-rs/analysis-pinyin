@@ -1,0 +1,27 @@
+[package]
+name = "pizza-pinyin"
+version = "0.1.0"
+edition = "2021"
+repository = "https://github.com/infinilabs/pizza-pinyin"
+categories = ["text-processing"]
+keywords = ["pizza", "pinyin", "chinese", "tokenizer", "search"]
+authors = ["INFINI Labs Team",]
+license = "MIT"
+description = "Fast, zero-copy, extensible Chinese-Pinyin analyzer for Pizza, ported from infinilabs/analysis-pinyin."
+build = "build.rs"
+
+[workspace]
+
+[features]
+# Default keeps the binary small: only the per-character primary/polyphone
+# table (~80 KB) plus the syllable alphabet.
+default = []
+# Bundle the ~11 MB polyphone phrase dictionary for context-aware
+# disambiguation (e.g. `银行` → `yin hang`, not `yin xing`). Opt-in.
+polyphone-dict = []
+
+[dependencies]
+pizza-common = { path = "../../lib/common" }
+pizza-engine = { path = "../../lib/engine" }
+
+[dev-dependencies]
