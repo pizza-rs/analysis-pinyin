@@ -13,6 +13,7 @@ pub mod dict;
 
 mod alphabet;
 mod config;
+mod normalizer;
 #[cfg(feature = "polyphone-dict")]
 mod polyphone_dict;
 mod rules;
@@ -20,6 +21,7 @@ mod tokenizer;
 
 pub use config::PinyinConfig;
 pub use dict::{PinyinDict, SyllableId};
+pub use normalizer::{PinyinNormalizeConfig, PinyinNormalizeMode, PinyinNormalizer};
 pub use rules::{Reading, Rules};
 pub use tokenizer::PinyinTokenizer;
 

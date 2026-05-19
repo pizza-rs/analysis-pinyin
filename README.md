@@ -263,6 +263,35 @@ alphabet (`pinyin_alphabet.dict`), so unknown chunks fall through unchanged.
 |-------------------|---------|--------------------------------------------------------------------------|
 | `polyphone-dict`  | off     | Bundle the ~450 K-entry phrase dictionary (~11 MB) and enable [`Rules::with_builtin_polyphones`]. |
 
+## Normalizer
+
+[`PinyinNormalizer`](src/normalizer.rs) implements the `pizza-engine`
+`Normalizer` trait, converting Chinese characters to pinyin **in-place**
+before tokenization. Three output modes are available:
+
+| Mode | Input | Output |
+|------|-------|--------|
+| `FullPinyin` (default) | `"刘德华"` | `"liu de hua"` |
+| `JoinedPinyin` | `"刘德华"` | `"liudehua"` |
+| `FirstLetter` | `"刘德华"` | `"ldh"` |
+
+```rust
+use pizza_pinyin::{PinyinNormalizer, PinyinNormalizeConfig, PinyinNormalizeMode};
+use pizza_engine::analysis::Normalizer;
+
+let normalizer = PinyinNormalizer::new(PinyinNormalizeConfig {
+    mode: PinyinNormalizeMode::FullPinyin,
+    separator: " ",
+    lowercase: true,
+});
+let mut text = String::from("刘德华");
+normalizer.normalize(&mut text);
+assert_eq!(text, "liu de hua");
+```
+
+Non-Chinese characters are passed through unchanged, making it safe to use
+on mixed-language text.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
