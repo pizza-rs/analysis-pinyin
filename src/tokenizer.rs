@@ -37,6 +37,23 @@ fn is_ascii_letter_or_digit(c: char) -> bool {
     c.is_ascii_alphanumeric()
 }
 
+/// FNV-1a 64-bit hash — fast, allocation-free, good enough for dedup.
+#[inline]
+fn fnv1a_hash(bytes: &[u8], extra: u32) -> u64 {
+    let mut h: u64 = 0xcbf29ce484222325;
+    for &b in bytes {
+        h ^= b as u64;
+        h = h.wrapping_mul(0x100000001b3);
+    }
+    // Mix in the position/extra discriminator.
+    let eb = extra.to_le_bytes();
+    for &b in &eb {
+        h ^= b as u64;
+        h = h.wrapping_mul(0x100000001b3);
+    }
+    h
+}
+
 /// Internal candidate (kept compact: 16 + 4 + 4 + 4 + 1 = 29 bytes per entry).
 #[derive(Debug, Clone)]
 struct Candidate<'a> {
@@ -89,18 +106,24 @@ impl PinyinTokenizer {
 impl Tokenizer for PinyinTokenizer {
     fn tokenize<'a>(&self, text: &'a str) -> Vec<Token<'a>> {
         let cfg = &self.config;
-        let chars: Vec<(usize, char)> = text.char_indices().collect();
-        let char_count = chars.len();
+        if text.is_empty() {
+            return Vec::new();
+        }
+
+        // Build byte-offset table + char array in a single pass (avoids
+        // the old `char_indices().collect()` + separate `only_chars` vec).
+        let mut byte_off: Vec<u32> = Vec::with_capacity(text.len() / 2 + 1);
+        let mut only_chars: Vec<char> = Vec::with_capacity(text.len() / 2);
+        for (b, c) in text.char_indices() {
+            byte_off.push(b as u32);
+            only_chars.push(c);
+        }
+        byte_off.push(text.len() as u32);
+        let char_count = only_chars.len();
         if char_count == 0 {
             return Vec::new();
         }
 
-        // Byte-offset table: idx -> byte offset of char at idx, plus sentinel.
-        let mut byte_off: Vec<u32> = Vec::with_capacity(char_count + 1);
-        for (b, _) in &chars {
-            byte_off.push(*b as u32);
-        }
-        byte_off.push(text.len() as u32);
         let to_byte = |s: usize, e: usize| -> (u32, u32) {
             (
                 byte_off.get(s).copied().unwrap_or(text.len() as u32),
@@ -112,7 +135,6 @@ impl Tokenizer for PinyinTokenizer {
         // we store an optional `&Reading` to use instead of the dict lookup.
         let mut overlay: Vec<Option<&Reading>> = vec![None; char_count];
         if !self.rules.is_empty() {
-            let only_chars: Vec<char> = chars.iter().map(|(_, c)| *c).collect();
             let mut i = 0usize;
             while i < char_count {
                 if let Some(hit) = self.rules.match_phrase(&only_chars, i) {
@@ -127,8 +149,9 @@ impl Tokenizer for PinyinTokenizer {
         }
 
         let mut candidates: Vec<Candidate<'a>> = Vec::with_capacity(char_count * 2 + 4);
-        // Dedup key set. Reserve to avoid rehash for typical short inputs.
-        let mut terms_filter: HashSet<String> = HashSet::with_capacity(char_count * 2 + 4);
+        // Dedup set: stores u64 hashes of (term, position) or (term) depending
+        // on config. Avoids per-candidate String allocation entirely.
+        let mut terms_filter: HashSet<u64> = HashSet::with_capacity(char_count * 2 + 4);
         let mut first_letters: Vec<u8> = Vec::with_capacity(char_count);
         let mut joined_full = String::with_capacity(char_count * 4);
         let mut position: u32 = 0;
@@ -141,7 +164,9 @@ impl Tokenizer for PinyinTokenizer {
         let mut buff_char_end: usize = 0;
         let buff_active = |start: usize, end: usize| start < end;
 
-        for (i, &(byte_idx, c)) in chars.iter().enumerate() {
+        for i in 0..char_count {
+            let c = only_chars[i];
+            let byte_idx = byte_off[i] as usize;
             if (c as u32) < 128 {
                 if !buff_active(buff_byte_start, buff_byte_end) {
                     buff_byte_start = byte_idx;
@@ -417,7 +442,7 @@ impl PinyinTokenizer {
         _last_offset: usize,
         position: &mut u32,
         candidates: &mut Vec<Candidate<'a>>,
-        terms_filter: &mut HashSet<String>,
+        terms_filter: &mut HashSet<u64>,
         byte_off: &[u32],
     ) {
         let cfg = &self.config;
@@ -511,7 +536,7 @@ impl PinyinTokenizer {
 fn push_candidate<'a>(
     cfg: &PinyinConfig,
     candidates: &mut Vec<Candidate<'a>>,
-    terms_filter: &mut HashSet<String>,
+    terms_filter: &mut HashSet<u64>,
     mut item: Candidate<'a>,
 ) {
     // Normalize: lowercase + trim (only allocate if a transform is needed).
@@ -530,18 +555,14 @@ fn push_candidate<'a>(
     if item.term.is_empty() {
         return;
     }
-    let key = if cfg.remove_duplicate_term {
-        item.term.to_string()
+    // Hash-based dedup: FNV-1a of term bytes + optional position discriminator.
+    // Replaces the old per-candidate String allocation.
+    let hash = if cfg.remove_duplicate_term {
+        fnv1a_hash(item.term.as_bytes(), 0)
     } else {
-        // Compact dedup key without an intermediate allocation pair.
-        let mut k = String::with_capacity(item.term.len() + 6);
-        k.push_str(&item.term);
-        // u32::MAX has 10 digits.
-        use std::fmt::Write;
-        let _ = write!(&mut k, "{}", item.position);
-        k
+        fnv1a_hash(item.term.as_bytes(), item.position)
     };
-    if !terms_filter.insert(key) {
+    if !terms_filter.insert(hash) {
         return;
     }
     candidates.push(item);
