@@ -7,7 +7,10 @@
 
 // Tiny, scoped `unsafe` usage in `dict::homophone_chars` (sound u32→char cast
 // — every value was produced by `c as u32`). All other modules are unsafe-free.
+#![no_std]
 #![deny(unsafe_op_in_unsafe_fn)]
+
+extern crate alloc;
 
 pub mod dict;
 
@@ -28,3 +31,5 @@ pub use tokenizer::PinyinTokenizer;
 /// Re-export of the alphabet re-segmentation helper, in case callers want to
 /// reuse the pure pinyin-string max-matching outside the tokenizer.
 pub use alphabet::walk as segment_pinyin_alphabet;
+pub mod register;
+pub use register::register_all;

@@ -13,8 +13,8 @@
 //! The tokenizer is also configurable via [`crate::Rules`] for per-character
 //! and phrase-level pinyin overrides (polyphone disambiguation).
 
-use std::borrow::Cow;
-use std::collections::HashSet;
+use alloc::borrow::Cow;
+use hashbrown::HashSet;
 
 use pizza_engine::analysis::Token;
 use pizza_engine::analysis::Tokenizer;

@@ -1,8 +1,8 @@
 [package]
-name = "pizza-pinyin"
+name = "pizza-analysis-pinyin"
 version = "0.1.0"
 edition = "2021"
-repository = "https://github.com/infinilabs/pizza-pinyin"
+repository = "https://github.com/infinilabs/analysis-pinyin"
 categories = ["text-processing"]
 keywords = ["pizza", "pinyin", "chinese", "tokenizer", "search"]
 authors = ["INFINI Labs Team",]
@@ -10,7 +10,6 @@ license = "MIT"
 description = "Fast, zero-copy, extensible Chinese-Pinyin analyzer for Pizza, ported from infinilabs/analysis-pinyin."
 build = "build.rs"
 
-[workspace]
 
 [features]
 # Default keeps the binary small: only the per-character primary/polyphone
@@ -23,5 +22,6 @@ polyphone-dict = []
 [dependencies]
 pizza-common = { path = "../../lib/common" }
 pizza-engine = { path = "../../lib/engine" }
+hashbrown = { version = "0.14", default-features = false }
 
 [dev-dependencies]

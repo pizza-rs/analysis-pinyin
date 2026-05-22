@@ -15,7 +15,7 @@
 //! pre-loads ~450 K curated phrase entries from the original Java project's
 //! `polyphone.txt`.
 
-use std::collections::HashMap;
+use hashbrown::HashMap;
 
 use crate::dict::{PinyinDict, SyllableId};
 
