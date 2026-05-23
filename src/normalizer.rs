@@ -142,12 +142,6 @@ impl Normalizer for PinyinNormalizer {
     }
 }
 
-impl NormalizerClone for PinyinNormalizer {
-    fn clone_box(&self) -> Box<dyn Normalizer> {
-        Box::new(self.clone())
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

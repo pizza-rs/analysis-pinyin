@@ -7,7 +7,7 @@
 
 // Tiny, scoped `unsafe` usage in `dict::homophone_chars` (sound u32→char cast
 // — every value was produced by `c as u32`). All other modules are unsafe-free.
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
 #![deny(unsafe_op_in_unsafe_fn)]
 
 extern crate alloc;

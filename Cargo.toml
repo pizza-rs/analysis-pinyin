@@ -7,7 +7,7 @@ categories = ["text-processing"]
 keywords = ["pizza", "pinyin", "chinese", "tokenizer", "search"]
 authors = ["INFINI Labs Team",]
 license = "MIT"
-description = "Fast, zero-copy, extensible Chinese-Pinyin analyzer for Pizza, ported from infinilabs/analysis-pinyin."
+description = "Chinese Pinyin conversion plugin for INFINI Pizza"
 build = "build.rs"
 
 
@@ -18,10 +18,11 @@ default = []
 # Bundle the ~11 MB polyphone phrase dictionary for context-aware
 # disambiguation (e.g. `银行` → `yin hang`, not `yin xing`). Opt-in.
 polyphone-dict = []
+std = ["pizza-engine/std"]
 
 [dependencies]
 pizza-common = { path = "../../lib/common" }
-pizza-engine = { path = "../../lib/engine" }
+pizza-engine = { path = "../../lib/engine", default-features = false }
 hashbrown = { version = "0.14", default-features = false }
 
 [dev-dependencies]
