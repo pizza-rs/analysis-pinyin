@@ -1,5 +1,5 @@
 //! Port of the Java `PinyinTokenizer` from
-//! [`infinilabs/analysis-pinyin`](https://github.com/infinilabs/analysis-pinyin),
+//! [`pizza-rs/analysis-pinyin`](https://github.com/pizza-rs/analysis-pinyin),
 //! redesigned for zero allocation on the hot path:
 //!
 //! - Pinyin syllables are returned as `Cow::Borrowed(&'static str)` (pointing

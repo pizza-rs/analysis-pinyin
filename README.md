@@ -12,8 +12,8 @@
 ---
 
 A fast, compact, **zero-copy** Chinese-Pinyin analyzer/tokenizer for
-[Pizza](https://github.com/infinilabs/pizza), ported from the Java
-[`infinilabs/analysis-pinyin`](https://github.com/infinilabs/analysis-pinyin)
+[Pizza](https://github.com/pizza-rs/pizza), ported from the Java
+[`pizza-rs/analysis-pinyin`](https://github.com/pizza-rs/analysis-pinyin)
 Elasticsearch / OpenSearch / Easysearch plugin.
 
 It converts Chinese text into pinyin tokens with the same configurable
@@ -307,5 +307,5 @@ on mixed-language text.
 
 MIT — see [LICENSE](LICENSE).
 
-Pizza-pinyin is part of the [Pizza](https://github.com/infinilabs/pizza)
+Pizza-pinyin is part of the [Pizza](https://github.com/pizza-rs/pizza)
 search engine project. Visit [pizza.rs](http://pizza.rs) for more details.

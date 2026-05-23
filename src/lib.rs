@@ -3,7 +3,7 @@
 // Copyright (C) INFINI Labs & INFINI LIMITED. <hello@infini.ltd>
 //
 // Pinyin analyzer/tokenizer for Pizza, ported from the Java
-// `infinilabs/analysis-pinyin` plugin.
+// `pizza-rs/analysis-pinyin` plugin.
 
 // Tiny, scoped `unsafe` usage in `dict::homophone_chars` (sound u32→char cast
 // — every value was produced by `c as u32`). All other modules are unsafe-free.

@@ -2,7 +2,7 @@
 name = "pizza-analysis-pinyin"
 version = "0.1.0"
 edition = "2021"
-repository = "https://github.com/infinilabs/analysis-pinyin"
+repository = "https://github.com/pizza-rs/analysis-pinyin"
 categories = ["text-processing"]
 keywords = ["pizza", "pinyin", "chinese", "tokenizer", "search"]
 authors = ["INFINI Labs Team",]
