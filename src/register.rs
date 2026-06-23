@@ -20,21 +20,21 @@ use crate::{PinyinConfig, PinyinNormalizeConfig, PinyinNormalizeMode, PinyinNorm
 /// in the Rust crate; `pinyin_first_letter` is provided via config.
 pub fn register_all(factory: &mut AnalysisFactory) {
     // Tokenizers
-    factory.register_tokenizer("pinyin", Box::new(PinyinTokenizer::new(PinyinConfig::default())));
+    factory.register_tokenizer_with("pinyin", || Box::new(PinyinTokenizer::new(PinyinConfig::default())));
 
     // Normalizer: converts Chinese chars to pinyin (pre-tokenization, like a char_filter)
-    factory.register_normalizer("pinyin", Box::new(PinyinNormalizer::with_defaults()));
-    factory.register_normalizer(
+    factory.register_normalizer_with("pinyin", || Box::new(PinyinNormalizer::with_defaults()));
+    factory.register_normalizer_with(
         "pinyin_first_letter",
-        Box::new(PinyinNormalizer::new(PinyinNormalizeConfig {
+        || Box::new(PinyinNormalizer::new(PinyinNormalizeConfig {
             mode: PinyinNormalizeMode::FirstLetter,
             ..PinyinNormalizeConfig::default()
         })),
     );
 
     // Analyzer: pinyin (just the tokenizer, matches Java PinyinAnalyzer)
-    factory.register_analyzer(
+    factory.register_analyzer_with(
         "pinyin",
-        Analyzer::new(vec![], Box::new(PinyinTokenizer::new(PinyinConfig::default())), vec![]),
+        || Analyzer::new(vec![], Box::new(PinyinTokenizer::new(PinyinConfig::default())), vec![]),
     );
 }

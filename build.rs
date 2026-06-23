@@ -23,6 +23,12 @@ const CJK_LEN: usize = (CJK_END_EXCL - CJK_START) as usize;
 const NO_SYLLABLE: u16 = u16::MAX;
 
 fn main() {
+    // Only bake the optimized tables when `embed` is enabled. Without it,
+    // dict.rs builds equivalent tables at runtime — see `dict::tab` (no-embed).
+    if env::var_os("CARGO_FEATURE_EMBED").is_none() {
+        return;
+    }
+
     println!("cargo:rerun-if-changed=data/pinyin.txt");
     println!("cargo:rerun-if-changed=data/pinyin_alphabet.dict");
     println!("cargo:rerun-if-changed=data/polyphone.txt");
