@@ -10,7 +10,8 @@
 //! - **Joined**: `"刘德华"` → `"liudehua"`
 //! - **First letter**: `"刘德华"` → `"ldh"`
 
-use pizza_engine::analysis::{Normalizer, NormalizerClone};
+use pizza_engine::analysis::Normalizer;
+use pizza_engine::analysis::NormalizerClone;
 
 use crate::dict::PinyinDict;
 
@@ -95,8 +96,7 @@ impl Normalizer for PinyinNormalizer {
                         // Separate the pinyin run from any preceding output
                         // (e.g. "hello刘…" → "hello liu…", not "helloliu…")
                         let boundary = need_sep
-                            || (!out.is_empty()
-                                && !out.ends_with(|x: char| x.is_whitespace()));
+                            || (!out.is_empty() && !out.ends_with(|x: char| x.is_whitespace()));
                         if let Some(pinyin) = PinyinDict::primary(c) {
                             if boundary {
                                 out.push_str(self.config.separator);
@@ -131,7 +131,10 @@ impl Normalizer for PinyinNormalizer {
                 }
             } else {
                 // Non-Chinese character — pass through.
-                if need_sep && self.config.mode == PinyinNormalizeMode::FullPinyin && !c.is_whitespace() {
+                if need_sep
+                    && self.config.mode == PinyinNormalizeMode::FullPinyin
+                    && !c.is_whitespace()
+                {
                     out.push_str(self.config.separator);
                 }
                 out.push(c);

@@ -23,9 +23,13 @@ mod rules;
 mod tokenizer;
 
 pub use config::PinyinConfig;
-pub use dict::{PinyinDict, SyllableId};
-pub use normalizer::{PinyinNormalizeConfig, PinyinNormalizeMode, PinyinNormalizer};
-pub use rules::{Reading, Rules};
+pub use dict::PinyinDict;
+pub use dict::SyllableId;
+pub use normalizer::PinyinNormalizeConfig;
+pub use normalizer::PinyinNormalizeMode;
+pub use normalizer::PinyinNormalizer;
+pub use rules::Reading;
+pub use rules::Rules;
 pub use tokenizer::PinyinTokenizer;
 
 /// Re-export of the alphabet re-segmentation helper, in case callers want to

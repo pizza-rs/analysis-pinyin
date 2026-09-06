@@ -22,7 +22,8 @@ use pizza_engine::analysis::Tokenizer;
 use crate::alphabet;
 use crate::config::PinyinConfig;
 use crate::dict::PinyinDict;
-use crate::rules::{Reading, Rules};
+use crate::rules::Reading;
+use crate::rules::Rules;
 
 const CJK_START: char = '\u{4E00}';
 const CJK_END: char = '\u{9FA5}';
@@ -486,10 +487,7 @@ impl PinyinTokenizer {
                     cur_char + take_chars
                 };
                 *position += 1;
-                let s = byte_off
-                    .get(cur_char)
-                    .copied()
-                    .unwrap_or(text.len() as u32);
+                let s = byte_off.get(cur_char).copied().unwrap_or(text.len() as u32);
                 let e = byte_off.get(end_char).copied().unwrap_or(text.len() as u32);
                 push_candidate(
                     cfg,

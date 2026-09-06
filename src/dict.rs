@@ -89,13 +89,17 @@ const NO_SYLLABLE: u16 = u16::MAX;
 mod tab {
     use alloc::borrow::Cow;
     use alloc::boxed::Box;
-    use alloc::collections::{BTreeMap, BTreeSet};
+    use alloc::collections::BTreeMap;
+    use alloc::collections::BTreeSet;
     use alloc::string::String;
     use alloc::vec;
     use alloc::vec::Vec;
     use std::sync::OnceLock;
 
-    use super::{CJK_END_EXCL, CJK_LEN, CJK_START, NO_SYLLABLE};
+    use super::CJK_END_EXCL;
+    use super::CJK_LEN;
+    use super::CJK_START;
+    use super::NO_SYLLABLE;
 
     /// Runtime mirror of the build-script tables, all leaked to `'static`.
     pub(super) struct Tables {
@@ -461,6 +465,7 @@ impl ReadingIter {
 
 impl Iterator for ReadingIter {
     type Item = SyllableId;
+
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(p) = self.primary.take() {
             return Some(p);

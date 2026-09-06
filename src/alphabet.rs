@@ -21,7 +21,10 @@ pub fn walk(text: &str) -> Vec<String> {
     } else {
         text.to_string()
     };
-    seg_pinyin_str(&lowered).into_iter().map(str::to_string).collect()
+    seg_pinyin_str(&lowered)
+        .into_iter()
+        .map(str::to_string)
+        .collect()
 }
 
 /// Zero-copy variant of [`walk`]: returns sub-slices of `text` whenever the

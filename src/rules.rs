@@ -17,7 +17,8 @@
 
 use hashbrown::HashMap;
 
-use crate::dict::{PinyinDict, SyllableId};
+use crate::dict::PinyinDict;
+use crate::dict::SyllableId;
 
 /// Either a borrowed `&'static str` from the bundled dictionary, or an owned
 /// override supplied by the user. Both compare/hash by the underlying text.
@@ -160,7 +161,9 @@ impl Rules {
     /// (`polyphone.txt`). Only available with the `polyphone-dict` feature.
     #[cfg(feature = "polyphone-dict")]
     pub fn with_builtin_polyphones(mut self) -> Self {
-        use crate::polyphone_dict::{PHRASE_DATA, PHRASE_KEYS, PHRASE_PTR};
+        use crate::polyphone_dict::PHRASE_DATA;
+        use crate::polyphone_dict::PHRASE_KEYS;
+        use crate::polyphone_dict::PHRASE_PTR;
         for (i, phrase) in PHRASE_KEYS.iter().enumerate() {
             let start = PHRASE_PTR[i] as usize;
             let end = PHRASE_PTR[i + 1] as usize;
@@ -169,8 +172,10 @@ impl Rules {
             if chars.len() != ids.len() {
                 continue;
             }
-            let readings: Vec<Reading> =
-                ids.iter().map(|id| Reading::Static(SyllableId(*id).as_str())).collect();
+            let readings: Vec<Reading> = ids
+                .iter()
+                .map(|id| Reading::Static(SyllableId(*id).as_str()))
+                .collect();
             let entry = PhraseEntry {
                 phrase: phrase.to_string(),
                 readings,
@@ -214,7 +219,12 @@ impl Rules {
                 continue;
             }
             // Compare char-by-char to avoid a String allocation per probe.
-            if entry.phrase.chars().zip(&chars[start..start + plen]).all(|(a, b)| a == *b) {
+            if entry
+                .phrase
+                .chars()
+                .zip(&chars[start..start + plen])
+                .all(|(a, b)| a == *b)
+            {
                 return Some(PhraseHit {
                     char_len: plen,
                     readings: &entry.readings,

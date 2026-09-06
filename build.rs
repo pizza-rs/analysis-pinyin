@@ -151,7 +151,11 @@ fn main() {
         .map(str::trim)
         .filter(|s| !s.is_empty())
         .map(|s| s.to_ascii_lowercase())
-        .map(|s| *syllable_id.get(s.as_str()).expect("alphabet syllable in table"))
+        .map(|s| {
+            *syllable_id
+                .get(s.as_str())
+                .expect("alphabet syllable in table")
+        })
         .collect();
     alphabet_ids.sort_unstable();
     alphabet_ids.dedup();
@@ -302,8 +306,7 @@ fn main() {
         std::io::BufWriter::new(fs::File::create(&phrase_dest).expect("create polyphone_phrases"));
 
     if polyphone_enabled {
-        let polyphone_raw =
-            fs::read_to_string(&polyphone_txt).expect("read data/polyphone.txt");
+        let polyphone_raw = fs::read_to_string(&polyphone_txt).expect("read data/polyphone.txt");
         // Parse: each non-#, non-empty line is `<phrase>=<r1> <r2> ...` where
         // r_i = `<syll><tone-digit>`.
         // Build BTreeMap<phrase, Vec<SyllableId>> so we can emit a sorted

@@ -1,10 +1,16 @@
 //! Comprehensive tests for pizza-analysis-pinyin (Chinese Pinyin analysis).
 
-use pizza_analysis_pinyin::{
-    PinyinConfig, PinyinDict, PinyinNormalizeConfig, PinyinNormalizeMode, PinyinNormalizer,
-    PinyinTokenizer, Reading, Rules,
-};
-use pizza_engine::analysis::{Normalizer, Token, Tokenizer};
+use pizza_analysis_pinyin::PinyinConfig;
+use pizza_analysis_pinyin::PinyinDict;
+use pizza_analysis_pinyin::PinyinNormalizeConfig;
+use pizza_analysis_pinyin::PinyinNormalizeMode;
+use pizza_analysis_pinyin::PinyinNormalizer;
+use pizza_analysis_pinyin::PinyinTokenizer;
+use pizza_analysis_pinyin::Reading;
+use pizza_analysis_pinyin::Rules;
+use pizza_engine::analysis::Normalizer;
+use pizza_engine::analysis::Token;
+use pizza_engine::analysis::Tokenizer;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // Helpers
@@ -107,7 +113,9 @@ fn tokenize_chinese_produces_pinyin() {
     // Should contain pinyin like "zhong", "guo" or first letters "zg"
     assert!(!ts.is_empty());
     // At least one token should be pinyin-like (ASCII)
-    assert!(ts.iter().any(|s| s.chars().all(|c| c.is_ascii_alphabetic())));
+    assert!(ts
+        .iter()
+        .any(|s| s.chars().all(|c| c.is_ascii_alphabetic())));
 }
 
 #[test]
@@ -131,7 +139,9 @@ fn tokenize_produces_first_letter() {
     let tokens = t.tokenize("刘德华");
     let ts = terms(&tokens);
     // Should produce "ldh" or similar first-letter token
-    assert!(ts.iter().any(|s| s.len() <= 16 && s.chars().all(|c| c.is_ascii_alphabetic())));
+    assert!(ts
+        .iter()
+        .any(|s| s.len() <= 16 && s.chars().all(|c| c.is_ascii_alphabetic())));
 }
 
 #[test]
