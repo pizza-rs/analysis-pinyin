@@ -92,15 +92,20 @@ impl Normalizer for PinyinNormalizer {
             if is_chinese(c) {
                 match self.config.mode {
                     PinyinNormalizeMode::FullPinyin => {
+                        // Separate the pinyin run from any preceding output
+                        // (e.g. "hello刘…" → "hello liu…", not "helloliu…")
+                        let boundary = need_sep
+                            || (!out.is_empty()
+                                && !out.ends_with(|x: char| x.is_whitespace()));
                         if let Some(pinyin) = PinyinDict::primary(c) {
-                            if need_sep {
+                            if boundary {
                                 out.push_str(self.config.separator);
                             }
                             out.push_str(pinyin);
                             need_sep = true;
                         } else {
                             // Unknown character — pass through.
-                            if need_sep {
+                            if boundary {
                                 out.push_str(self.config.separator);
                             }
                             out.push(c);
