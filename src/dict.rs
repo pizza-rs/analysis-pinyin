@@ -152,24 +152,33 @@ mod tab {
     }
 
     #[cfg(feature = "embed-fallback")]
-    const EMBEDDED_PINYIN: &str = include_str!("../data/pinyin.txt");
+    const EMBEDDED_PINYIN: Option<&str> = Some(include_str!("../data/pinyin.txt"));
     #[cfg(not(feature = "embed-fallback"))]
-    const EMBEDDED_PINYIN: &str = "";
+    const EMBEDDED_PINYIN: Option<&str> = None;
     #[cfg(feature = "embed-fallback")]
-    const EMBEDDED_ALPHABET: &str = include_str!("../data/pinyin_alphabet.dict");
+    const EMBEDDED_ALPHABET: Option<&str> = Some(include_str!("../data/pinyin_alphabet.dict"));
     #[cfg(not(feature = "embed-fallback"))]
-    const EMBEDDED_ALPHABET: &str = "";
+    const EMBEDDED_ALPHABET: Option<&str> = None;
 
-    fn load(file: &str, embedded: &'static str) -> Cow<'static, str> {
+    fn load(file: &str, embedded: Option<&'static str>) -> Cow<'static, str> {
         #[cfg(feature = "std")]
         {
-            pizza_engine::analysis::dict::load_str("pinyin", file, Some(embedded))
-                .unwrap_or(Cow::Borrowed(embedded))
+            // The shipped pizza build compiles no embedded copy in: the
+            // external dictionary under `<dict_dir>/pinyin/` is the only
+            // source, so a missing file must fail loudly instead of quietly
+            // producing empty tables (and unmapped characters).
+            pizza_engine::analysis::dict::load_str("pinyin", file, embedded).unwrap_or_else(|e| {
+                panic!(
+                    "pinyin dictionary '{file}' is not available: {e}; stage it under \
+                     config/analysis/pinyin/ ('make copy-analysis-dicts') or build \
+                     pizza-analysis-pinyin with the 'embed-fallback' feature"
+                )
+            })
         }
         #[cfg(not(feature = "std"))]
         {
             let _ = file;
-            Cow::Borrowed(embedded)
+            Cow::Borrowed(embedded.unwrap_or(""))
         }
     }
 
